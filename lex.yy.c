@@ -786,63 +786,63 @@ case 1:
 YY_RULE_SETUP
 #line 20 "tr-parte1.lex"
 {
-    printf("Operador de comparacao lido: %s", yytext);
+	printf("Operador de comparacao lido: %s", yytext);
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 24 "tr-parte1.lex"
 {
-    printf("Operador de multiplicacao lido: %s", yytext);
+	printf("Operador de multiplicacao lido: %s", yytext);
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 28 "tr-parte1.lex"
 {
-    printf("Operador de soma lido: %s", yytext);
+	printf("Operador de soma lido: %s", yytext);
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 32 "tr-parte1.lex"
 {
-    printf("Operador booleano lido: %s", yytext);
+	printf("Operador booleano lido: %s", yytext);
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 36 "tr-parte1.lex"
 {
-    printf("Tipo lido: %s", yytext);
+	printf("Tipo lido: %s", yytext);
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 40 "tr-parte1.lex"
 {
-    printf("Palavra reservada lida: %s", yytext);
+	printf("Palavra reservada lida: %s", yytext);
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 44 "tr-parte1.lex"
 {
-    printf("Int lido: %d", atoi(yytext));
+	printf("Int lido: %d", atoi(yytext));
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 48 "tr-parte1.lex"
 {
-    printf("Float lido: %f", atof(yytext));
+	printf("Float lido: %f", atof(yytext));
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 52 "tr-parte1.lex"
 {
-    printf("ID lido: %s", yytext);
+	printf("ID lido: %s", yytext);
 }
 	YY_BREAK
 case 10:
@@ -1858,17 +1858,15 @@ void yyfree (void * ptr )
 #line 56 "tr-parte1.lex"
 
 
-
-
 int main (int argc, char **argv) {
-    ++argv, --argc;
-    if (argc > 0) {
-        yyin = fopen(argv[0], "r");
-    } else {
-        yyin = stdin;
-    }
+	++argv, --argc;
+	if (argc > 0) {
+		yyin = fopen(argv[0], "r");
+	} else {
+		yyin = stdin;
+	}
 
-    yylex();
+	yylex();
 
-    return 0;
+	return 0;
 }
