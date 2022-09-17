@@ -1,5 +1,11 @@
 %{
-#include <math.h>
+#include "helpers.h"
+
+int numLines = 0;
+int numCol = 0;
+int numOfTokens = 0;
+
+Table *table = NULL;
 %}
 
 /* ============ */
@@ -17,40 +23,49 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 %%
 
+[ \t]+ {
+	numCol++;
+}
+
+\n {
+	numLines++;
+	numCol = 0;
+}
+
 {COMPARISONS} {
-	printf("Operador de comparacao lido: %s", yytext);
+	addToken(&table, yytext, "Comparisons", &numOfTokens, &numLines, &numCol);
 }
 
 {MULT} {
-	printf("Operador de multiplicacao lido: %s", yytext);
+	addToken(&table, yytext, "Mult", &numOfTokens, &numLines, &numCol);
 }
 
 {SUM} {
-	printf("Operador de soma lido: %s", yytext);
+	addToken(&table, yytext, "Sum", &numOfTokens, &numLines, &numCol);
 }
 
 {BOOL} {
-	printf("Operador booleano lido: %s", yytext);
+	addToken(&table, yytext, "Bool", &numOfTokens, &numLines, &numCol);
 }
 
 {TYPES} {
-	printf("Tipo lido: %s", yytext);
+	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
 }
 
 {KEYWORDS} {
-	printf("Palavra reservada lida: %s", yytext);
+	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 }
 
 {NUM}+ {
-	printf("Int lido: %d", atoi(yytext));
+	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
 
 {NUM}+"."{NUM}+ {
-	printf("Float lido: %f", atof(yytext));
+	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 }
 
 {CHAR}+({NUM}|{CHAR})* {
-	printf("ID lido: %s", yytext);
+	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 }
 
 %%
@@ -64,6 +79,9 @@ int main (int argc, char **argv) {
 	}
 
 	yylex();
+	printTable(table, numOfTokens);
+	printf("Confira o arquivo 'output.txt' para ver o resultado\n\n");
+	system("cat output.txt");
 
 	return 0;
 }
