@@ -33,6 +33,13 @@ Table* newTable() {
 	return table;
 }
 
+void destroyRow(Row* row) {
+	free(row->coords->next);
+	free(row->coords);
+	free(row->next);
+	free(row);
+}
+
 Coord* searchToken(Table* table, char* token) {
 	Row* tokenTable = table->first;
 
@@ -48,84 +55,83 @@ Coord* searchToken(Table* table, char* token) {
 }
 
 void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int *numLine, int *numCol) {
-	(*numOfTokens) += 1;
+	// Primeiro token lido da fita (arquivo)
 	if (*table == NULL) {
+		(*numOfTokens) += 1;
 		*table = newTable();
 
-		(*table)->first = malloc(sizeof(Row));
-		// Primeira coluna instanciada
+		(*table)->first = (Row*) malloc(sizeof(Row));
 
-		(*table)->first->token = malloc((sizeof(char) * strlen(token)));
+		(*table)->first->token = (char*) malloc((sizeof(char) * strlen(token)));
 		strcpy((*table)->first->token, token);
-		// Token instanciado e adicionado na tabela
 
-		(*table)->first->type = malloc(sizeof(char) * strlen(tokenType));
+		(*table)->first->type = (char*) malloc(sizeof(char) * strlen(tokenType));
 		strcpy((*table)->first->type, tokenType);
-		// Tipo do token lido instanciado e adicionado na tabela
 
 		(*table)->first->length = strlen(token);
-		// Tamanho do token lido adicionado na tabela
 
-		(*table)->first->coords = malloc(sizeof(Coord));
+		(*table)->first->coords = (Coord*) malloc(sizeof(Coord));
 		(*table)->first->coords->line = *numLine;
-		// Linha do programa em que o token foi encontrado
-
 		(*table)->first->coords->col = *numCol;
-		// Coluna da linha em que o token foi encontrado
 		(*table)->first->coords->next = NULL;
 
 		(*table)->first->numOfCoords = 1;
 
-		// Proximo token NULL pois não há outro token até o momento
 		(*table)->first->next = NULL;
 
-		// Primeiro token lido também é o primeiro.
 		(*table)->last = (*table)->first;
 	} else {
-		Coord* coordToken = searchToken(*table, token);
-		if (coordToken == NULL) {
+		// Demais tokens da fita
+		Row *tempRow = (*table)->first;
+		Row *auxRow = NULL;
+
+		// Laço para percorrer tokens presentes na tabela
+		while (tempRow != NULL) {
+			// Row *auxRow recebe ponteiro do token da tabela caso token já existente
+			if (strcmp(tempRow->token, token) == 0) {
+				auxRow = (Row*) malloc(sizeof(Row));
+				auxRow = tempRow;
+				break;
+			// Novo token
+			// Row *auxToken permanece NULL
+			} else {
+				tempRow = (Row*) tempRow->next;
+			}
+		}
+
+		if (auxRow == NULL) {
+			(*numOfTokens) += 1;
 			Row *nextToken;
-			nextToken = malloc(sizeof(Row*));
-			// Proximo token instanciado
+			nextToken = (Row*) malloc(sizeof(Row*));
 
 			nextToken->token = (char*)malloc((sizeof(char) * strlen(token)));
 			strcpy(nextToken->token, token);
-			// Token instanciado
 
 			nextToken->type = (char*)malloc(sizeof(char) * strlen(tokenType));
 			strcpy(nextToken->type, tokenType);
-			// Tipo do token lido instanciado
 
 			nextToken->length = strlen(token);
-			// Tamanho do token lido
 
-			nextToken->coords = malloc(sizeof(Coord));
+			nextToken->coords = (Coord*) malloc(sizeof(Coord));
 			nextToken->coords->line = *numLine;
-			// Linha do programa em que o token foi encontrado
 
 			nextToken->coords->col = *numCol;
-			// Coluna da linha em que o token foi encontrado
 			nextToken->coords->next = NULL;
 
 			nextToken->next = NULL;
-			// Proximo token NULL pois não há outro token até o momento
 
 			(*table)->last->next = nextToken;
-			// Proximo token adicionado na tabela como seguinte do ultimo
 
 			(*table)->last = nextToken;
-			// Ultimo token atualizado para o token lido
 		} else {
-			coordToken->next->line = *numLine;
-			coordToken->next->col = *numCol;
-			coordToken->next->next = NULL;
-
-			(*table)->last->coords = coordToken;
-			(*table)->last->numOfCoords += 1;
+			auxRow->coords->next = (Coord*) malloc(sizeof(Coord));
+			// Adicionar coordenada na lista encadeada de posições do token
+			auxRow->coords->next->line = *numLine;
+			auxRow->coords->next->col = *numCol;
+			auxRow->coords->next->next = NULL;
 		}
 	}
 	*numCol += strlen(token);
-	// Indice da coluna somado com o tamanho do token lido
 }
 
 void printTable(Table *table, int tableSize) {
@@ -133,19 +139,28 @@ void printTable(Table *table, int tableSize) {
 	auxRow = (Row*)malloc(sizeof(Row));
 
 	auxRow = table->first;
-	// Token auxiliar para imprimir os tokens na tabela de simbolos
 	FILE *fptr;
 	fptr = fopen("output.txt", "w+");
 	fprintf(fptr, "**************************************\n");
 	fprintf(fptr, "          TABELA DE SIMBOLOS          \n");
 	fprintf(fptr, "**************************************\n\n");
 
-	fprintf(fptr, "TOKEN\tTIPO\tTAMANHO\tLINHA\tCOLUNA\n");
+	fprintf(fptr, "TOKEN\tTIPO\tTAMANHO\tPOSICAO\n");
 	for (int i = 0; i < tableSize; i++) {
-		fprintf(fptr, "%s\t%s\t%d\t%d\t%d\n", auxRow->token, auxRow->type, auxRow->length, auxRow->coords->line, auxRow->coords->col);
+		fprintf(fptr, "%s\t%s\t%d\t", auxRow->token, auxRow->type, auxRow->length);
+		Coord* tempCoord = auxRow->coords;
+		while (tempCoord != NULL) {
+			if (tempCoord->next == NULL) {
+				fprintf(fptr, "(%d, %d)\n", tempCoord->line, tempCoord->col);
+			} else {
+				fprintf(fptr, "(%d, %d), ", tempCoord->line, tempCoord->col);
+			}
+			tempCoord = tempCoord->next;
+		}
 		auxRow = auxRow->next;
 	}
 	fprintf(fptr, "\n***************************************\n");
+	printf("\n***************************************\n");
 	fclose(fptr);
 }
 
