@@ -1,6 +1,12 @@
+// comentario uma linha so
 int main(void) {
 	double a = 1;
 	double b = 2;
+	/*
+		comentario 
+		de varias 
+		linhas
+	*/
 	int c = a + b;
 	int teste = 20;
 	return 0;

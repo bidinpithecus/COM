@@ -1,8 +1,8 @@
 %{
 #include "helpers.h"
 
-int numLines = 0;
-int numCol = 0;
+int numLines = 1;
+int numCol = 1;
 int numOfTokens = 0;
 
 Table *table = NULL;
@@ -23,13 +23,22 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 %%
 
+"//"[^}\n]* {
+	numLines++;
+	/* eat up one-line comments */
+}
+
+"/*"([^*]|\*+[^*/])*\*+"/" {
+	/* eat up multi-line comments */
+}
+
 [ \t]+ {
 	numCol++;
 }
 
 \n {
 	numLines++;
-	numCol = 0;
+	numCol = 1;
 }
 
 {COMPARISONS} {
@@ -66,6 +75,10 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 {CHAR}+({NUM}|{CHAR})* {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
+}
+
+. {
+	printf( "Unrecognized character: %s\n", yytext );
 }
 
 %%
