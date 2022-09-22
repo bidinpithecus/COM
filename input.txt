@@ -1,8 +1,0 @@
-int main(void) {
-	double a = 1;
-	double b = 2;
-	int c = a + b;
-	int teste = 20;
-	return 0;
-	retorno;
-}
