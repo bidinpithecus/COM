@@ -75,8 +75,6 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 		(*table)->first->coords->col = *numCol;
 		(*table)->first->coords->next = NULL;
 
-		(*table)->first->numOfCoords = 1;
-
 		(*table)->first->next = NULL;
 
 		(*table)->last = (*table)->first;
@@ -104,10 +102,10 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 			Row *nextToken;
 			nextToken = (Row*) malloc(sizeof(Row*));
 
-			nextToken->token = (char*)malloc((sizeof(char) * strlen(token)));
+			nextToken->token = (char*) malloc((sizeof(char) * strlen(token)));
 			strcpy(nextToken->token, token);
 
-			nextToken->type = (char*)malloc(sizeof(char) * strlen(tokenType));
+			nextToken->type = (char*) malloc(sizeof(char) * strlen(tokenType));
 			strcpy(nextToken->type, tokenType);
 
 			nextToken->length = strlen(token);
@@ -124,11 +122,14 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 
 			(*table)->last = nextToken;
 		} else {
-			auxRow->coords->next = (Coord*) malloc(sizeof(Coord));
-			// Adicionar coordenada na lista encadeada de posições do token
-			auxRow->coords->next->line = *numLine;
-			auxRow->coords->next->col = *numCol;
-			auxRow->coords->next->next = NULL;
+			Coord* newCoord = (Coord*) malloc(sizeof(Coord));
+			newCoord->line = *numLine;
+			newCoord->col = *numCol;
+			newCoord->next = auxRow->coords;
+
+			auxRow->coords = newCoord;
+
+			// auxRow->coords->next = (Coord*) malloc(sizeof(Coord));
 		}
 	}
 	*numCol += strlen(token);
@@ -160,7 +161,6 @@ void printTable(Table *table, int tableSize) {
 		auxRow = auxRow->next;
 	}
 	fprintf(fptr, "\n***************************************\n");
-	printf("\n***************************************\n");
 	fclose(fptr);
 }
 
