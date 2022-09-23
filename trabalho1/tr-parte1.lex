@@ -29,11 +29,8 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 }
 
 "/*"([^*]|\*+[^*/])*\*+"/" {
-	/* eat up multi-line comments */
-}
-
-[ \t]+ {
-	numCol++;
+	numCol += strlen(yytext);
+	/* Ignorando comentários multi linha*/
 }
 
 \n {
@@ -42,15 +39,15 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 }
 
 {COMPARISONS} {
-	addToken(&table, yytext, "Comparisons", &numOfTokens, &numLines, &numCol);
+	addToken(&table, yytext, "CompOP", &numOfTokens, &numLines, &numCol);
 }
 
 {MULT} {
-	addToken(&table, yytext, "Mult", &numOfTokens, &numLines, &numCol);
+	addToken(&table, yytext, "MultOP", &numOfTokens, &numLines, &numCol);
 }
 
 {SUM} {
-	addToken(&table, yytext, "Sum", &numOfTokens, &numLines, &numCol);
+	addToken(&table, yytext, "SumOP", &numOfTokens, &numLines, &numCol);
 }
 
 {BOOL} {
@@ -65,6 +62,10 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 }
 
+{CHAR}+({NUM}|{CHAR})* {
+	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
+}
+
 {NUM}+ {
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
@@ -73,12 +74,12 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 }
 
-{CHAR}+({NUM}|{CHAR})* {
-	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
+[ \t] {
+	numCol++;
 }
 
 . {
-	printf( "Unrecognized character: %s\n", yytext );
+	printf("Erro lexico: %s\n", yytext);
 }
 
 %%

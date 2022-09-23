@@ -11,9 +11,8 @@ typedef struct Coord {
 } Coord;
 
 typedef struct Row {
+	char *lexema;
 	char *token;
-	char *type;
-	int length;
 	struct Coord *coords;
 	int numOfCoords;
 	struct Row *next;
@@ -32,21 +31,20 @@ Table* newTable() {
 	return table;
 }
 
-void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int *numLine, int *numCol) {
-	// Primeiro token lido da fita (arquivo)
+void addToken(Table **table, char *lexema, char* tokenType, int *numOfTokens, int *numLine, int *numCol) {
+	// Primeiro lexema lido da fita (arquivo)
 	if (*table == NULL) {
 		(*numOfTokens) += 1;
 		*table = newTable();
 
 		(*table)->first = (Row*) malloc(sizeof(Row));
 
-		(*table)->first->token = (char*) malloc((sizeof(char) * strlen(token)));
-		strcpy((*table)->first->token, token);
+		(*table)->first->lexema = (char*) malloc((sizeof(char) * strlen(lexema)));
+		strcpy((*table)->first->lexema, lexema);
 
-		(*table)->first->type = (char*) malloc(sizeof(char) * strlen(tokenType));
-		strcpy((*table)->first->type, tokenType);
+		(*table)->first->token = (char*) malloc(sizeof(char) * strlen(tokenType));
+		strcpy((*table)->first->token, tokenType);
 
-		(*table)->first->length = strlen(token);
 
 		(*table)->first->coords = (Coord*) malloc(sizeof(Coord));
 		(*table)->first->coords->line = *numLine;
@@ -63,12 +61,12 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 
 		// Laço para percorrer tokens presentes na tabela
 		while (tempRow != NULL) {
-			// Row *auxRow recebe ponteiro do token da tabela caso token já existente
-			if (strcmp(tempRow->token, token) == 0) {
+			// Row *auxRow recebe ponteiro do lexema da tabela caso lexema já existente
+			if (strcmp(tempRow->lexema, lexema) == 0) {
 				auxRow = (Row*) malloc(sizeof(Row));
 				auxRow = tempRow;
 				break;
-			// Novo token
+			// Novo lexema
 			// Row *auxToken permanece NULL
 			} else {
 				tempRow = (Row*) tempRow->next;
@@ -78,15 +76,14 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 		if (auxRow == NULL) {
 			(*numOfTokens) += 1;
 			Row *nextToken;
-			nextToken = (Row*) malloc(sizeof(Row*));
+			nextToken = (Row*) malloc(sizeof(Row));
 
-			nextToken->token = (char*) malloc((sizeof(char) * strlen(token)));
-			strcpy(nextToken->token, token);
+			nextToken->lexema = (char*) malloc((sizeof(char) * strlen(lexema)));
+			strcpy(nextToken->lexema, lexema);
 
-			nextToken->type = (char*) malloc(sizeof(char) * strlen(tokenType));
-			strcpy(nextToken->type, tokenType);
+			nextToken->token = (char*) malloc(sizeof(char) * strlen(tokenType));
+			strcpy(nextToken->token, tokenType);
 
-			nextToken->length = strlen(token);
 
 			nextToken->coords = (Coord*) malloc(sizeof(Coord));
 			nextToken->coords->line = *numLine;
@@ -106,11 +103,9 @@ void addToken(Table **table, char *token, char* tokenType, int *numOfTokens, int
 			newCoord->next = auxRow->coords;
 
 			auxRow->coords = newCoord;
-
-			// auxRow->coords->next = (Coord*) malloc(sizeof(Coord));
 		}
 	}
-	*numCol += strlen(token);
+	*numCol += strlen(lexema);
 }
 
 void printTable(Table *table, int tableSize) {
@@ -124,9 +119,9 @@ void printTable(Table *table, int tableSize) {
 	fprintf(fptr, "          TABELA DE SIMBOLOS          \n");
 	fprintf(fptr, "**************************************\n\n");
 
-	fprintf(fptr, "TOKEN\tTIPO\tTAMANHO\tPOSICAO\n");
+	fprintf(fptr, "LEXEMA\tTOKEN\tPOSICAO\n");
 	for (int i = 0; i < tableSize; i++) {
-		fprintf(fptr, "%s\t%s\t%d\t", auxRow->token, auxRow->type, auxRow->length);
+		fprintf(fptr, "%s\t%s\t", auxRow->lexema, auxRow->token);
 		Coord* tempCoord = auxRow->coords;
 		while (tempCoord != NULL) {
 			if (tempCoord->next == NULL) {
