@@ -1,19 +1,22 @@
+pororoca1
+ pororoca2
+	pororoca3
 // comentario uma linha so
 int main(void) {
 	float a = 1;
 	float b = 2;
 	float varF = 4.5;
-	boolhere;
+	boolhe;
 	/**
-		comentario 
-		de varias 
+		comentario
+		de varias
 		linhas
 	*/
 	int c = a + b;
 	int d = a - b;
 	int teste = 20;
 	return 0;
-	retorno;
+	reto*rno;
 	!
 	9x;
 	88dao7

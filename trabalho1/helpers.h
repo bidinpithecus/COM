@@ -119,9 +119,9 @@ void printTable(Table *table, int tableSize) {
 	fprintf(fptr, "          TABELA DE SIMBOLOS          \n");
 	fprintf(fptr, "**************************************\n\n");
 
-	fprintf(fptr, "LEXEMA\tTOKEN\tPOSICAO\n");
+	fprintf(fptr, "LEXEMA\t\tTOKEN\t\tPOSICAO\n");
 	for (int i = 0; i < tableSize; i++) {
-		fprintf(fptr, "%s\t%s\t", auxRow->lexema, auxRow->token);
+		fprintf(fptr, "%s\t\t%s\t\t", auxRow->lexema, auxRow->token);
 		Coord* tempCoord = auxRow->coords;
 		while (tempCoord != NULL) {
 			if (tempCoord->next == NULL) {

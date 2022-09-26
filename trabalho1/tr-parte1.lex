@@ -14,6 +14,7 @@ Table *table = NULL;
 
 NUM [0-9]
 CHAR [a-zA-Z]
+ID {CHAR}({CHAR}|{NUM})*
 COMPARISONS "<="|"<"|">"|">="|"=="|"!="
 SUM "+"|"-"
 MULT "*"|"/"
@@ -23,19 +24,27 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 %%
 
-"//"[^}\n]* {
+[\r\n] {
 	numLines++;
-	/* eat up one-line comments */
+	numCol = 1;
+}
+
+[ \t] {
+	numCol++;
+}
+
+"//"[^}\n]* {
+	// Comentario de uma linha apenas
 }
 
 "/*"([^*]|\*+[^*/])*\*+"/" {
+	/* Ignorando comentários multi linha */
+	for (int i = 0; i < strlen(yytext); i++) {
+		if (yytext[i] == '\n') {
+			numLines++;
+		}
+	}
 	numCol += strlen(yytext);
-	/* Ignorando comentários multi linha*/
-}
-
-\n {
-	numLines++;
-	numCol = 1;
 }
 
 {COMPARISONS} {
@@ -62,10 +71,6 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 }
 
-{CHAR}+({NUM}|{CHAR})* {
-	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
-}
-
 {NUM}+ {
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
@@ -74,12 +79,12 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 }
 
-[ \t] {
-	numCol++;
+{ID} {
+	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 }
 
 . {
-	printf("Erro lexico: %s\n", yytext);
+	printf("Erro lexico na linha %d e coluna %d: %s\n", numLines, numCol, yytext);
 }
 
 %%
