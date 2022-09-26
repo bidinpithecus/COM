@@ -4,6 +4,8 @@ int main(void) {
 	float b = 2;
 	float varF = 4.5;
 	boolhere;
+	int j = a*2;
+	int i = 2*j;
 	/**
 		comentario 
 		de varias 

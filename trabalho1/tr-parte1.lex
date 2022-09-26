@@ -66,6 +66,10 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 }
 
+{NUM}+({NUM}|{CHAR})+ {
+	pointError(yytext, "lexico", numLines, numCol);
+}
+
 {NUM}+ {
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
@@ -79,7 +83,7 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 }
 
 . {
-	printf("Erro lexico: %s\n", yytext);
+	pointError(yytext, "lexico", numLines, numCol);
 }
 
 %%
