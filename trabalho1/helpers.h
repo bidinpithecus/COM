@@ -108,6 +108,10 @@ void addToken(Table **table, char *lexema, char* tokenType, int *numOfTokens, in
 	*numCol += strlen(lexema);
 }
 
+void pointError(char* lexema, char* typeErr, int numLine, int numCol) {
+	printf("Erro %s em linha %d, coluna %d: %s\n", typeErr, numLine, numCol, lexema);
+}
+
 void printTable(Table *table, int tableSize) {
 	Row *auxRow;
 	auxRow = (Row*)malloc(sizeof(Row));
