@@ -75,16 +75,20 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
 
-{NUM}+"."{NUM}+ {
-	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
+({NUM}|{COMPARISONS})({NUM}|{CHAR})* {
+	pointError(yytext, "lexico", numLines, numCol);
 }
 
 {ID} {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 }
 
+{NUM}+"."{NUM}+ {
+	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
+}
+
 . {
-	printf("Erro lexico na linha %d e coluna %d: %s\n", numLines, numCol, yytext);
+	pointError(yytext, "lexico", numLines, numCol);
 }
 
 %%
