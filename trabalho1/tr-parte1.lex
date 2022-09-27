@@ -15,6 +15,7 @@ Table *table = NULL;
 NUM [0-9]
 CHAR [a-zA-Z]
 ID {CHAR}({CHAR}|{NUM})*
+FLOAT {NUM}+"."{NUM}+
 COMPARISONS "<="|"<"|">"|">="|"=="|"!="
 SUM "+"|"-"
 MULT "*"|"/"
@@ -75,16 +76,20 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 }
 
-({NUM}|{COMPARISONS})({NUM}|{CHAR})* {
+{FLOAT}"."({NUM}|{CHAR}|{FLOAT})* {
+	pointError(yytext, "lexico", numLines, numCol);
+}
+
+{FLOAT} {
+	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
+}
+
+({NUM}|{COMPARISONS}|{FLOAT})({NUM}|{CHAR}|{FLOAT})* {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 
 {ID} {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
-}
-
-{NUM}+"."{NUM}+ {
-	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 }
 
 . {

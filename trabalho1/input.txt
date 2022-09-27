@@ -6,7 +6,8 @@ pororoca1
 int main(void) {
 	float a = 1;
 	float b = 2;
-	float varF = 4.5;
+	float varF = 4.5a;
+	4.2.1;
 	boolhere;
 	int j = a*2;
 	int i = 2*j;
