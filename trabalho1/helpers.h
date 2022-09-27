@@ -14,7 +14,6 @@ typedef struct Row {
 	char *lexema;
 	char *token;
 	struct Coord *coords;
-	int numOfCoords;
 	struct Row *next;
 } Row;
 
