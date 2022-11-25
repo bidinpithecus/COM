@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_TR_PARTE2_TAB_H_INCLUDED
 # define YY_YY_TR_PARTE2_TAB_H_INCLUDED
@@ -44,45 +45,47 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    T_INT = 258,
-    T_FLOAT = 259,
-    T_ID = 260,
-    T_SUM = 261,
-    T_SUB = 262,
-    T_MULT = 263,
-    T_DIV = 264,
-    T_TRUE = 265,
-    T_FALSE = 266,
-    T_OPEN_BRACKETS = 267,
-    T_CLOSE_BRACKETS = 268,
-    T_OPEN_CURLY_BRACKETS = 269,
-    T_CLOSE_CURLY_BRACKETS = 270,
-    T_OPEN_PARENTHESIS = 271,
-    T_CLOSE_PARENTHESIS = 272,
-    T_SEMICOLON = 273,
-    T_INT_TYPE = 274,
-    T_VOID_TYPE = 275,
-    T_FLOAT_TYPE = 276,
-    T_BOOL_TYPE = 277,
-    T_SMALLER_EQUALS = 278,
-    T_SMALLER = 279,
-    T_GREATER = 280,
-    T_GREATER_EQUALS = 281,
-    T_EQUALS = 282,
-    T_DIFFERENT = 283,
-    T_IF = 284,
-    T_ELSE = 285,
-    T_WHILE = 286,
-    T_RETURN = 287,
-    T_COMMA = 288,
-    T_ATR = 289,
-    T_LEX_ERROR = 290
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    T_INT = 258,                   /* T_INT  */
+    T_FLOAT = 259,                 /* T_FLOAT  */
+    T_VOID = 260,                  /* T_VOID  */
+    T_BOOL = 261,                  /* T_BOOL  */
+    T_ID = 262,                    /* T_ID  */
+    T_SUM = 263,                   /* T_SUM  */
+    T_SUB = 264,                   /* T_SUB  */
+    T_MULT = 265,                  /* T_MULT  */
+    T_DIV = 266,                   /* T_DIV  */
+    T_TRUE = 267,                  /* T_TRUE  */
+    T_FALSE = 268,                 /* T_FALSE  */
+    T_OPEN_BRACKETS = 269,         /* T_OPEN_BRACKETS  */
+    T_CLOSE_BRACKETS = 270,        /* T_CLOSE_BRACKETS  */
+    T_OPEN_CURLY_BRACKETS = 271,   /* T_OPEN_CURLY_BRACKETS  */
+    T_CLOSE_CURLY_BRACKETS = 272,  /* T_CLOSE_CURLY_BRACKETS  */
+    T_OPEN_PARENTHESIS = 273,      /* T_OPEN_PARENTHESIS  */
+    T_CLOSE_PARENTHESIS = 274,     /* T_CLOSE_PARENTHESIS  */
+    T_SEMICOLON = 275,             /* T_SEMICOLON  */
+    T_SMALLER_EQUALS = 276,        /* T_SMALLER_EQUALS  */
+    T_SMALLER = 277,               /* T_SMALLER  */
+    T_GREATER = 278,               /* T_GREATER  */
+    T_GREATER_EQUALS = 279,        /* T_GREATER_EQUALS  */
+    T_EQUALS = 280,                /* T_EQUALS  */
+    T_DIFFERENT = 281,             /* T_DIFFERENT  */
+    T_IF = 282,                    /* T_IF  */
+    T_ELSE = 283,                  /* T_ELSE  */
+    T_WHILE = 284,                 /* T_WHILE  */
+    T_RETURN = 285,                /* T_RETURN  */
+    T_COMMA = 286,                 /* T_COMMA  */
+    T_ATR = 287                    /* T_ATR  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -94,7 +97,7 @@ union YYSTYPE
 	int ival;
 	float fval;
 
-#line 98 "tr-parte2.tab.h"
+#line 101 "tr-parte2.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -105,6 +108,8 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
+
 int yyparse (void);
+
 
 #endif /* !YY_YY_TR_PARTE2_TAB_H_INCLUDED  */

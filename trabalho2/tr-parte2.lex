@@ -101,13 +101,13 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "int") == 0) {
-		return T_INT_TYPE;
+		return T_INT;
 	} else 	if (strcmp(yytext, "float") == 0) {
-		return T_FLOAT_TYPE;
+		return T_FLOAT;
 	} else 	if (strcmp(yytext, "bool") == 0) {
-		return T_BOOL_TYPE;
+		return T_BOOL;
 	} else 	if (strcmp(yytext, "void") == 0) {
-		return T_VOID_TYPE;
+		return T_VOID;
 	}
 }
 
@@ -151,8 +151,6 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 {FLOAT}"."({NUM}|{CHAR}|{FLOAT})* {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 
 {FLOAT} {
@@ -163,8 +161,6 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 ({NUM}|{COMPARISONS}|{FLOAT})({NUM}|{CHAR}|{FLOAT})* {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 
 {ID} {
@@ -175,8 +171,6 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 
 . {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 
 %%

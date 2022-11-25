@@ -911,13 +911,13 @@ YY_RULE_SETUP
 	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "int") == 0) {
-		return T_INT_TYPE;
+		return T_INT;
 	} else 	if (strcmp(yytext, "float") == 0) {
-		return T_FLOAT_TYPE;
+		return T_FLOAT;
 	} else 	if (strcmp(yytext, "bool") == 0) {
-		return T_BOOL_TYPE;
+		return T_BOOL;
 	} else 	if (strcmp(yytext, "void") == 0) {
-		return T_VOID_TYPE;
+		return T_VOID;
 	}
 }
 	YY_BREAK
@@ -970,13 +970,11 @@ YY_RULE_SETUP
 #line 152 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 158 "tr-parte2.lex"
+#line 156 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 
@@ -985,16 +983,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 164 "tr-parte2.lex"
+#line 162 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 170 "tr-parte2.lex"
+#line 166 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 
@@ -1003,19 +999,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 176 "tr-parte2.lex"
+#line 172 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
-
-	return T_LEX_ERROR;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 182 "tr-parte2.lex"
+#line 176 "tr-parte2.lex"
 ECHO;
 	YY_BREAK
-#line 1019 "lex.yy.c"
+#line 1013 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2020,6 +2014,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 182 "tr-parte2.lex"
+#line 176 "tr-parte2.lex"
 
 

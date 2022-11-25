@@ -20,6 +20,8 @@ void yyerror(const char* s);
 
 %token<ival> T_INT
 %token<fval> T_FLOAT
+%token<fval> T_VOID
+%token<fval> T_BOOL
 
 %token T_ID
 %token T_SUM T_SUB
@@ -29,45 +31,140 @@ void yyerror(const char* s);
 %token T_OPEN_CURLY_BRACKETS T_CLOSE_CURLY_BRACKETS
 %token T_OPEN_PARENTHESIS T_CLOSE_PARENTHESIS
 %token T_SEMICOLON
-%token T_INT_TYPE T_VOID_TYPE T_FLOAT_TYPE T_BOOL_TYPE
 %token T_SMALLER_EQUALS T_SMALLER T_GREATER T_GREATER_EQUALS T_EQUALS T_DIFFERENT
 %token T_IF T_ELSE
 %token T_WHILE
 %token T_RETURN
 %token T_COMMA
 %token T_ATR
-%token T_LEX_ERROR
 
 %left T_SUM T_SUB
 %left T_MULT T_DIV
 
-/* %type<ival> expr */
-/* %type<fval> mixed_expr */
-
 %start programa
 
 %%
-programa: declaracao-lista
-    ;
+programa:		declaracao-lista
+	;
 
-declaracao-lista: declaracao-lista declaracao
-    | declaracao
-    ;
+declaracao-lista:	declaracao-lista declaracao
+	|		declaracao
+	;
 
-declaracao: var-declaracao
-    /* | fun-declaracao */
-    ;
+declaracao:		var-declaracao
+	|		fun-declaracao
+	;
 
-var-declaracao: tipo-especificador T_ID T_SEMICOLON
-    | tipo-especificador T_ID T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON
-    ;
-/* 
-fun-declaracao: tipo-especificador T_ID T_OPEN_PARENTHESIS params T_CLOSE_PARENTHESIS composto-decl
-    ; */
+var-declaracao:		tipo-especificador T_ID T_SEMICOLON 
+	|		tipo-especificador T_ID T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON
+	;
 
-tipo-especificador: T_INT_TYPE
-    | T_VOID_TYPE
-    ;
+tipo-especificador:	T_INT
+	|		T_FLOAT
+	|		T_VOID
+	|		T_BOOL
+	;
+
+fun-declaracao:		tipo-especificador T_ID T_OPEN_PARENTHESIS params T_CLOSE_PARENTHESIS composto-decl
+	;
+
+params:			param-lista
+	|		T_VOID
+	;
+
+param-lista:		param-lista T_COMMA param
+	|		param
+	;
+
+param:			tipo-especificador T_ID
+	|		tipo-especificador T_ID T_OPEN_BRACKETS T_CLOSE_BRACKETS
+	;
+
+composto-decl:		T_OPEN_CURLY_BRACKETS local-declaracoes statement-lista T_CLOSE_CURLY_BRACKETS
+	;
+
+local-declaracoes:	local-declaracoes var-declaracao
+	|
+	;
+
+statement-lista:	statement-lista statement
+	|
+	;
+
+statement:		expressao-decl
+	|		composto-decl
+	|		selecao-decl
+	|		iteracao-decl
+	|		retorno-decl
+	;
+
+expressao-decl:		expressao T_SEMICOLON
+	|		T_SEMICOLON
+	;
+
+selecao-decl:		T_IF T_OPEN_PARENTHESIS expressao T_CLOSE_PARENTHESIS statement
+	|		T_IF T_OPEN_PARENTHESIS expressao T_CLOSE_PARENTHESIS statement T_ELSE statement
+	;
+
+iteracao-decl:		T_WHILE T_OPEN_PARENTHESIS expressao T_CLOSE_PARENTHESIS statement
+	;
+
+retorno-decl:		T_RETURN T_SEMICOLON
+	|		T_RETURN expressao T_SEMICOLON
+	;
+
+expressao:		var T_ATR expressao
+	|		simples-expressao
+	;
+
+var:			T_ID
+	|		T_ID T_OPEN_BRACKETS expressao T_CLOSE_BRACKETS
+	;
+
+simples-expressao:	soma-expressao relacional soma-expressao
+	|		soma-expressao
+	;
+
+relacional:		T_SMALLER_EQUALS
+	|		T_SMALLER
+	|		T_GREATER
+	|		T_GREATER_EQUALS
+	|		T_EQUALS
+	|		T_DIFFERENT
+	;
+
+soma-expressao:		soma-expressao soma termo
+	|		termo
+	;
+
+soma:			T_SUM
+	|		T_SUB
+	;
+
+termo:			termo mult fator
+	|		fator
+	;
+	
+mult:			T_MULT
+	|		T_DIV
+	;
+
+fator:			T_OPEN_PARENTHESIS expressao T_CLOSE_PARENTHESIS
+	|		var
+	|		ativacao
+	|		T_INT
+	;
+
+ativacao:		T_ID T_OPEN_PARENTHESIS args T_CLOSE_PARENTHESIS
+	;
+
+args:			arg-lista
+	|
+	;
+
+arg-lista:		arg-lista T_COMMA expressao
+	|		expressao
+	;
 
 %%
 
