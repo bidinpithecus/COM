@@ -124,6 +124,8 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 		return T_RETURN;
 	} else if (strcmp(yytext, ";") == 0) {
 		return T_SEMICOLON;
+	} else if (strcmp(yytext, ":") == 0) {
+		return T_COLON;
 	} else if (strcmp(yytext, "[") == 0) {
 		return T_OPEN_BRACKETS;
 	} else if (strcmp(yytext, "]") == 0) {
@@ -140,6 +142,10 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="
 		return T_COMMA;
 	} else if (strcmp(yytext, "=") == 0) {
 		return T_ATR;
+	} else if (strcmp(yytext, "function") == 0) {
+		return T_FUNCTION;
+	} else if (strcmp(yytext, "procedure") == 0) {
+		return T_PROCEDURE;
 	}
 }
 
