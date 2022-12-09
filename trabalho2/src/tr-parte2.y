@@ -46,22 +46,25 @@ void yyerror(const char* s);
 %start programa
 
 %%
-programa:	{ initiateProgram(); }	declaracao_lista { finishProgram(); printf("Programa lido com sucesso\n"); }
+programa:	{ printf("Programa iniciado\n"); initiateProgram(); } declaracao_lista { finishProgram(); printf("Programa lido com sucesso\n"); }
 	;
 
-declaracao_lista:	declaracao_lista declaracao
-	|		declaracao
+declaracao_lista:	declaracao_lista  { printf("declaracao_lista\n"); } declaracao
+	|		declaracao { printf("declaracao\n"); }
 	;
 
-declaracao:		var_declaracao
+declaracao:		var_declaracao { printf("var_declaracao\n"); }
 	|		fun_declaracao
 	;
 
-var_declaracao:		tipo_especificador T_ID T_SEMICOLON 
-	|		tipo_especificador T_ID T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON
+var_declaracao:		tipo_especificador_novo T_SEMICOLON 
+	|		tipo_especificador_novo T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON
 	;
 
-tipo_especificador:	T_INT_TYPE { $$ = strdup($1); }
+tipo_especificador_novo: tipo_especificador { printf("tipo\n"); } T_ID
+	;
+
+tipo_especificador:	T_INT_TYPE { $$ = $1; }
 	|				T_FLOAT_TYPE { $$ = strdup($1); }
 	|				T_VOID_TYPE { $$ = strdup($1); }
 	|				T_BOOL_TYPE { $$ = strdup($1); }

@@ -2,8 +2,8 @@
 
 
 char outputFileName[] = "output/output.j";
-char writeContent[] = "a";
-char appendContent[] = "w+";
+char writeContent[] = "w";
+char appendContent[] = "a";
 char intInitial = 'i';
 char floatInitial = 'f';
 
@@ -137,6 +137,7 @@ void manipulateOutputFile(char *fileName, char* modes, char* content) {
 	}
 
 	fprintf(fptr, "%s", content);
+	fclose(fptr);
 }
 
 void writeInitialMethod() {
@@ -330,6 +331,7 @@ int numOfDigits(int num) {
 }
 
 char* intToString(int num) {
+	printf("int to string\n");
 	char* buffer = malloc(sizeof(char) * numOfDigits(num));
 
 	sprintf(buffer, "%d", num);

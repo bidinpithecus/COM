@@ -920,13 +920,13 @@ YY_RULE_SETUP
 	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "int") == 0) {
-		return T_INT;
+		return T_INT_TYPE;
 	} else 	if (strcmp(yytext, "float") == 0) {
-		return T_FLOAT;
+		return T_FLOAT_TYPE;
 	} else 	if (strcmp(yytext, "bool") == 0) {
-		return T_BOOL;
+		return T_BOOL_TYPE;
 	} else 	if (strcmp(yytext, "void") == 0) {
-		return T_VOID;
+		return T_VOID_TYPE;
 	}
 }
 	YY_BREAK
