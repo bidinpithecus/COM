@@ -1,3 +1,0 @@
-int nome;
-void teste;
-int var[10];
