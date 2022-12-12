@@ -1,1 +1,6 @@
-int var;
+function oioioi():int {
+    int abluble;
+    abluble = 5 + 10 + 7;
+
+    return;
+}

@@ -1,6 +1,5 @@
 #include "helpers.h"
 
-
 char outputFileName[] = "output/output.j";
 char writeContent[] = "w";
 char appendContent[] = "a";
@@ -182,7 +181,7 @@ void writePrintOnCode(char type) {
 	manipulateOutputFile(outputFileName, appendContent, invokeVirtual);
 }
 
-int getTokenVarNumber(Table* table, char id[]) {
+Row* getToken(Table* table, char id[]) {
 	Row *auxRow;
 
 	auxRow = (Row*)malloc(sizeof(Row));
@@ -190,13 +189,42 @@ int getTokenVarNumber(Table* table, char id[]) {
 
 	while (auxRow != NULL) {
 		if (strcmp(auxRow->lexema, id) == 0) {
-			numberOfTokensAdded++;
+			return auxRow;
+		}
+		auxRow = auxRow->next;
+	}
+
+	return NULL;
+}
+
+int getTokenVarNumber(Table* table, char id[]) {
+	Row *auxRow;
+
+	auxRow = (Row*)malloc(sizeof(Row));
+	auxRow = table->first;
+	while (auxRow != NULL) {
+		if (strcmp(auxRow->lexema, id) == 0) {
 			return auxRow->varNumber;
 		}
 		auxRow = auxRow->next;
 	}
 
 	return -1;
+}
+
+void changeTokenOnRow(Table* table, char id[], char newToken[]) {
+	Row *auxRow;
+
+	auxRow = (Row*)malloc(sizeof(Row));
+	auxRow = table->first;
+
+	while (auxRow != NULL) {
+		if (strcmp(auxRow->lexema, id) == 0) {
+			auxRow->token = malloc(sizeof(char) * strlen(newToken));
+			strcpy(auxRow->token, newToken);
+		}
+		auxRow = auxRow->next;
+	}
 }
 
 int getLineToken(Table* table, char id[]) {
@@ -215,22 +243,70 @@ int getLineToken(Table* table, char id[]) {
 	return 0;
 }
 
-void initializeVariableOnCode(Table* table, char id[], char type) {
+void initializeVariableOnCode(Table* table, char id[], char* type) {
 	manipulateOutputFile(outputFileName, appendContent, ".line ");
 	manipulateOutputFile(outputFileName, appendContent, intToString((getLineToken(table, id))));
 	manipulateOutputFile(outputFileName, appendContent, "\n");
 
 	if (! getTokenVarNumber(table, id)) {
 		// Variable does not exists yet
-		manipulateOutputFile(outputFileName, appendContent, &type);
-		manipulateOutputFile(outputFileName, appendContent, "const_0\n");
-		manipulateOutputFile(outputFileName, appendContent, &type);
-		manipulateOutputFile(outputFileName, appendContent, "store");
-		manipulateOutputFile(outputFileName, appendContent, intToString(++numberOfTokensAdded));
-		manipulateOutputFile(outputFileName, appendContent, "\n");
+		Row *auxRow;
+
+		auxRow = (Row*)malloc(sizeof(Row));
+		auxRow = getToken(table, id);
+
+		auxRow->varNumber = ++numberOfTokensAdded;
+		
+		if (strcmp(type, "i")) {
+			changeTokenOnRow(table, id, "int");
+		} else if (strcmp(type, "f")) {
+			changeTokenOnRow(table, id, "float");
+		}
+		char* toBeStored = malloc(sizeof(char) + strlen("const_0\n") + sizeof(char) + strlen("store") + strlen(intToString(numberOfTokensAdded)) + 2);
+		strcat(toBeStored, type);
+		strcat(toBeStored, "const_0\n");
+		strcat(toBeStored, type);
+		strcat(toBeStored, "store ");
+		strcat(toBeStored, intToString(numberOfTokensAdded));
+		strcat(toBeStored, "\n");
+		manipulateOutputFile(outputFileName, appendContent, toBeStored);
 	} else {
 		printf("Variable already exists\n");
 	} 
+}
+
+int getVarType(Table* table, char id[]) {
+	if (getTokenVarNumber(table, id)) {
+		Row* token = getToken(table, id);
+		if (strcmp(token->token, "int")) {
+			return 1;
+		} else if (strcmp(token->token, "float")) {
+			return 2;
+		}
+	}
+
+	printf("ATRIBUICAO DE VARIAVEL NAO INICIALIZADA\n");
+	
+	return 0;
+}
+
+void writeIntOnCode(int value) {
+	char* fileContent = malloc(sizeof(strlen("ldc ") + strlen(intToString(value)) + 2));
+	strcpy(fileContent, "ldc ");
+	strcat(fileContent, intToString(value));
+	strcat(fileContent, "\n\0");
+	manipulateOutputFile(outputFileName, appendContent, fileContent);
+}
+
+void writeFloatOnCode(float value) {
+	char* buffer = malloc(sizeof(char) * numOfDigits((int) value) + 2);
+	gcvt((double) value, numOfDigits((int) value) + 2, buffer);
+	char* fileContent = malloc(sizeof(strlen("ldc ") + strlen(buffer) + 2));
+
+	strcpy(fileContent, "ldc ");
+	strcat(fileContent, buffer);
+	strcat(fileContent, "\n\0");
+	manipulateOutputFile(outputFileName, appendContent, fileContent);
 }
 
 void pushIntToVariableOnCode(Table* table, char id[], int value) {
@@ -242,7 +318,7 @@ void pushIntToVariableOnCode(Table* table, char id[], int value) {
 		manipulateOutputFile(outputFileName, appendContent, "ldc ");
 		manipulateOutputFile(outputFileName, appendContent, intToString(value));
 		manipulateOutputFile(outputFileName, appendContent, "\nistore ");
-		manipulateOutputFile(outputFileName, appendContent, intToString(getLineToken(table, id)));
+		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
 	} else {
 		printf("Variable does not exists\n");
@@ -255,13 +331,13 @@ void pushFloatToVariableOnCode(Table* table, char id[], float value) {
 	manipulateOutputFile(outputFileName, appendContent, "\n");
 
 	if (getTokenVarNumber(table, id)) {
-		char* buffer = malloc(sizeof(char) * numOfDigits((int) value));
+		char* buffer = malloc(sizeof(char) * numOfDigits((int) value) + 2);
 		gcvt((double) value, numOfDigits((int) value) + 2, buffer);
-		
+
 		manipulateOutputFile(outputFileName, appendContent, "ldc ");
 		manipulateOutputFile(outputFileName, appendContent, buffer);
 		manipulateOutputFile(outputFileName, appendContent, "\nfstore ");
-		manipulateOutputFile(outputFileName, appendContent, intToString(getLineToken(table, id)));
+		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
 	} else {
 		printf("Variable does not exists\n");
@@ -308,20 +384,23 @@ void labelAndGoToOnCode(int label) {
 	manipulateOutputFile(outputFileName, appendContent, "\n");
 }
 
-void writeOpOnCode(char* op, char type) {
-	manipulateOutputFile(outputFileName, appendContent, &type);
-	char operation[5];
-	if (strcmp(op, "+")) {
-		strcpy(operation, "sum");
-	} else	if (strcmp(op, "-")) {
-		strcpy(operation, "sub");
-	} else	if (strcmp(op, "*")) {
-		strcpy(operation, "mul");
-	} else	if (strcmp(op, "/")) {
-		strcpy(operation, "div");
+void writeOpOnCode(char op, char type) {
+	char* operation = malloc(sizeof(char));
+	operation[0] = type;
+	if (op == '+') {
+		operation = realloc(operation, sizeof(char) * strlen("sum\n") + 1);
+		strcat(operation, "sum\n");
+	} else if (op == '-') {
+		operation = realloc(operation, sizeof(char) * strlen("sub\n") + 1);
+		strcat(operation, "sub\n");
+	} else if (op == '*') {
+		operation = realloc(operation, sizeof(char) * strlen("mul\n") + 1);
+		strcat(operation, "mul\n");
+	} else if (op == '/') {
+		operation = realloc(operation, sizeof(char) * strlen("div\n") + 1);
+		strcat(operation, "div\n");
 	}
-	operation[3] = '\n';
-	operation[4] = '\0';
+	
 	manipulateOutputFile(outputFileName, appendContent, operation);
 }
 
@@ -331,7 +410,6 @@ int numOfDigits(int num) {
 }
 
 char* intToString(int num) {
-	printf("int to string\n");
 	char* buffer = malloc(sizeof(char) * numOfDigits(num));
 
 	sprintf(buffer, "%d", num);

@@ -13,5 +13,14 @@ iconst_0
 istore 1
 fconst_0
 fstore 2
+.line 2
+iconst_0
+istore 3
+ldc 5
+isum
+isum
+.line 3
+ldc 7
+istore 3
 return
 .end method

@@ -881,28 +881,32 @@ YY_RULE_SETUP
 	addToken(&table, yytext, "MultOP", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "*") == 0) {
+		yylval.cval = yytext[0];
 		return T_MULT;
 	} else 	if (strcmp(yytext, "/") == 0) {
+		yylval.cval = yytext[0];
 		return T_DIV;
 	}
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 80 "tr-parte2.lex"
+#line 82 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "SumOP", &numOfTokens, &numLines, &numCol);
 	
 	if (strcmp(yytext, "+") == 0) {
+		yylval.cval = yytext[0];
 		return T_SUM;
 	} else 	if (strcmp(yytext, "-") == 0) {
+		yylval.cval = yytext[0];
 		return T_SUB;
 	}
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 90 "tr-parte2.lex"
+#line 94 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Bool", &numOfTokens, &numLines, &numCol);
 
@@ -915,116 +919,132 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 100 "tr-parte2.lex"
+#line 104 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
-
 	if (strcmp(yytext, "int") == 0) {
 		return T_INT_TYPE;
 	} else 	if (strcmp(yytext, "float") == 0) {
 		return T_FLOAT_TYPE;
 	} else 	if (strcmp(yytext, "bool") == 0) {
 		return T_BOOL_TYPE;
-	} else 	if (strcmp(yytext, "void") == 0) {
-		return T_VOID_TYPE;
 	}
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 114 "tr-parte2.lex"
+#line 115 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "if") == 0) {
+		yylval.sval = yytext;
 		return T_IF;
 	} else if (strcmp(yytext, "else") == 0) {
+		yylval.sval = yytext;
 		return T_ELSE;
 	} else if (strcmp(yytext, "while") == 0) {
+		yylval.sval = yytext;
 		return T_WHILE;
 	} else if (strcmp(yytext, "return") == 0) {
+		yylval.sval = yytext;
 		return T_RETURN;
 	} else if (strcmp(yytext, ";") == 0) {
+		yylval.sval = yytext;
 		return T_SEMICOLON;
 	} else if (strcmp(yytext, ":") == 0) {
+		yylval.sval = yytext;
 		return T_COLON;
 	} else if (strcmp(yytext, "[") == 0) {
+		yylval.sval = yytext;
 		return T_OPEN_BRACKETS;
 	} else if (strcmp(yytext, "]") == 0) {
+		yylval.sval = yytext;
 		return T_CLOSE_BRACKETS;
 	} else if (strcmp(yytext, "(") == 0) {
+		yylval.sval = yytext;
 		return T_OPEN_PARENTHESIS;
 	} else if (strcmp(yytext, ")") == 0) {
+		yylval.sval = yytext;
 		return T_CLOSE_PARENTHESIS;
 	} else if (strcmp(yytext, "{") == 0) {
+		yylval.sval = yytext;
 		return T_OPEN_CURLY_BRACKETS;
-	} else if (strcmp(yytext, "{") == 0) {
+	} else if (strcmp(yytext, "}") == 0) {
+		yylval.sval = yytext;
 		return T_CLOSE_CURLY_BRACKETS;
 	} else if (strcmp(yytext, ",") == 0) {
+		yylval.sval = yytext;
 		return T_COMMA;
 	} else if (strcmp(yytext, "=") == 0) {
+		yylval.sval = yytext;
 		return T_ATR;
 	} else if (strcmp(yytext, "function") == 0) {
+		yylval.sval = yytext;
 		return T_FUNCTION;
 	} else if (strcmp(yytext, "procedure") == 0) {
+		yylval.sval = yytext;
 		return T_PROCEDURE;
 	}
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 152 "tr-parte2.lex"
+#line 169 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
+	yylval.ival = atoi(yytext);
 	
 	return T_INT;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 158 "tr-parte2.lex"
+#line 176 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 162 "tr-parte2.lex"
+#line 180 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
+	yylval.fval = atof(yytext);
 
 	return T_FLOAT;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 168 "tr-parte2.lex"
+#line 187 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 172 "tr-parte2.lex"
+#line 191 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
+	yylval.sval = strdup(yytext);
 
 	return T_ID;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 178 "tr-parte2.lex"
+#line 198 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 182 "tr-parte2.lex"
+#line 202 "tr-parte2.lex"
 ECHO;
 	YY_BREAK
-#line 1028 "lex.yy.c"
+#line 1048 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2029,6 +2049,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 182 "tr-parte2.lex"
+#line 202 "tr-parte2.lex"
 
 
