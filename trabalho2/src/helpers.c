@@ -1,12 +1,19 @@
 #include "helpers.h"
+#include <stdio.h>
 
 char outputFileName[] = "output/output.j";
 char writeContent[] = "w";
 char appendContent[] = "a";
+
+char* opIf = NULL;
+
 char intInitial = 'i';
 char floatInitial = 'f';
 
 int numberOfTokensAdded = 2;
+int labelNum = 0;
+
+Table* table = NULL;
 
 Table* newTable() {
 	Table *table = (Table *)malloc(sizeof(Table));
@@ -165,20 +172,41 @@ void finishProgram() {
 
 void writePrintOnCode(char type) {
 	char getStatic[] = "getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-	char invokeVirtual[] = "invokevirtual java/io/PrintStream/println(I)V\n";
+	char invokeVirtual[] = "invokevirtual java/io/PrintStream/println(";
 
 	if (type == 'i') {
 		manipulateOutputFile(outputFileName, appendContent, "istore 1\n");
 		manipulateOutputFile(outputFileName, appendContent, getStatic);
 		manipulateOutputFile(outputFileName, appendContent, "iload 1\n");
-
+		manipulateOutputFile(outputFileName, appendContent, invokeVirtual);
+		manipulateOutputFile(outputFileName, appendContent, "I)V\n");
 	} else if (type == 'f') {
 		manipulateOutputFile(outputFileName, appendContent, "fstore 2\n");
 		manipulateOutputFile(outputFileName, appendContent, getStatic);
 		manipulateOutputFile(outputFileName, appendContent, "fload 2\n");
+		manipulateOutputFile(outputFileName, appendContent, invokeVirtual);
+		manipulateOutputFile(outputFileName, appendContent, "F)V\n");
 	}
-		
-	manipulateOutputFile(outputFileName, appendContent, invokeVirtual);
+}
+
+void loadVariable(Table *table, char id[]) {
+	Row* token = (Row*) malloc(sizeof(Row));
+	token = getToken(table, id);
+
+	char* fileContent = malloc(sizeof(char));
+	if (strcmp(token->token, "int") || strcmp(token->token, "bool")) {
+		fileContent[0] = 'i';
+	} else if (strcmp(token->token, "float")) {
+		fileContent[0] = 'f';
+	}
+
+	fileContent = realloc(fileContent, sizeof(char) + sizeof(char) * strlen("load ") + strlen(intToString(token->varNumber) + sizeof(char)));
+	strcat(fileContent, "load ");
+	strcat(fileContent, intToString(token->varNumber));
+	strcat(fileContent, "\n");
+
+	manipulateOutputFile(outputFileName, appendContent, fileContent);
+	free(fileContent);
 }
 
 Row* getToken(Table* table, char id[]) {
@@ -292,32 +320,29 @@ int getVarType(Table* table, char id[]) {
 
 void writeIntOnCode(int value) {
 	char* fileContent = malloc(sizeof(strlen("ldc ") + strlen(intToString(value)) + 2));
+	memset(fileContent, '\0', strlen(fileContent) + 1);
 	strcpy(fileContent, "ldc ");
 	strcat(fileContent, intToString(value));
 	strcat(fileContent, "\n\0");
 	manipulateOutputFile(outputFileName, appendContent, fileContent);
+	free(fileContent);
 }
 
 void writeFloatOnCode(float value) {
 	char* buffer = malloc(sizeof(char) * numOfDigits((int) value) + 2);
 	gcvt((double) value, numOfDigits((int) value) + 2, buffer);
 	char* fileContent = malloc(sizeof(strlen("ldc ") + strlen(buffer) + 2));
-
+	memset(fileContent, '\0', strlen(fileContent) + 1);
 	strcpy(fileContent, "ldc ");
 	strcat(fileContent, buffer);
 	strcat(fileContent, "\n\0");
 	manipulateOutputFile(outputFileName, appendContent, fileContent);
+	free(fileContent);
 }
 
-void pushIntToVariableOnCode(Table* table, char id[], int value) {
-	manipulateOutputFile(outputFileName, appendContent, ".line ");
-	manipulateOutputFile(outputFileName, appendContent, intToString((getLineToken(table, id))));
-	manipulateOutputFile(outputFileName, appendContent, "\n");
-
+void pushIntToVariableOnCode(Table* table, char id[]) {
 	if (getTokenVarNumber(table, id)) {
-		manipulateOutputFile(outputFileName, appendContent, "ldc ");
-		manipulateOutputFile(outputFileName, appendContent, intToString(value));
-		manipulateOutputFile(outputFileName, appendContent, "\nistore ");
+		manipulateOutputFile(outputFileName, appendContent, "istore ");
 		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
 	} else {
@@ -325,18 +350,9 @@ void pushIntToVariableOnCode(Table* table, char id[], int value) {
 	}
 }
 
-void pushFloatToVariableOnCode(Table* table, char id[], float value) {
-	manipulateOutputFile(outputFileName, appendContent, ".line ");
-	manipulateOutputFile(outputFileName, appendContent, intToString((getLineToken(table, id))));
-	manipulateOutputFile(outputFileName, appendContent, "\n");
-
+void pushFloatToVariableOnCode(Table* table, char id[]) {
 	if (getTokenVarNumber(table, id)) {
-		char* buffer = malloc(sizeof(char) * numOfDigits((int) value) + 2);
-		gcvt((double) value, numOfDigits((int) value) + 2, buffer);
-
-		manipulateOutputFile(outputFileName, appendContent, "ldc ");
-		manipulateOutputFile(outputFileName, appendContent, buffer);
-		manipulateOutputFile(outputFileName, appendContent, "\nfstore ");
+		manipulateOutputFile(outputFileName, appendContent, "fstore ");
 		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
 	} else {
@@ -344,22 +360,35 @@ void pushFloatToVariableOnCode(Table* table, char id[], float value) {
 	}
 }
 
-void writeRelationalOpOnCode(char* op, char type) {
-	manipulateOutputFile(outputFileName, appendContent, &type);
-	manipulateOutputFile(outputFileName, appendContent, "if_icmp");
-	if (strcmp(op, ">")) {
-		manipulateOutputFile(outputFileName, appendContent, "gt");
-	} else	if (strcmp(op, ">=")) {
-		manipulateOutputFile(outputFileName, appendContent, "ge");
-	} else	if (strcmp(op, "<")) {
-		manipulateOutputFile(outputFileName, appendContent, "lt");
-	} else	if (strcmp(op, "<=")) {
-		manipulateOutputFile(outputFileName, appendContent, "le");
-	} else	if (strcmp(op, "==")) {
-		manipulateOutputFile(outputFileName, appendContent, "eq");
-	} else	if (strcmp(op, "!=")) {
-		manipulateOutputFile(outputFileName, appendContent, "ne");
+int writeRelationalOpOnCode(char* op, char* type) {
+	incrementLabel();
+	char* fileContent = malloc(sizeof(char) * 20);
+	strcpy(fileContent, "if_");
+	strcat(fileContent, type);
+	strcat(fileContent, "cmp");
+	char* opt = malloc(sizeof(char) * 3); 
+	if (strcmp(op, ">") == 0) {
+		strcpy(opt, "gt");
+	} else	if (strcmp(op, ">=") == 0) {
+		strcpy(opt, "ge\0");
+	} else	if (strcmp(op, "<") == 0) {
+		strcpy(opt, "lt\0");
+	} else	if (strcmp(op, "<=") == 0) {
+		strcpy(opt, "le\0");
+	} else	if (strcmp(op, "==") == 0) {
+		strcpy(opt, "eq\0");
+	} else	if (strcmp(op, "!=") == 0) {
+		strcpy(opt, "ne\0");
 	}
+	fileContent = realloc(fileContent, sizeof(char) * (strlen(fileContent) + strlen(opt) + 2));
+	strcat(fileContent, opt);
+	free(opt);
+	strcat(fileContent, " ");
+	fileContent = realloc(fileContent, strlen(fileContent) + 1);
+	manipulateOutputFile(outputFileName, appendContent, fileContent);
+	free(fileContent);
+
+	return labelNum;
 }
 
 void writeLabelOnCode(int label) {
@@ -367,14 +396,19 @@ void writeLabelOnCode(int label) {
 	manipulateOutputFile(outputFileName, appendContent, intToString(label));
 }
 
-void writeFullLabelOnCode(int label) {
+void writeLabel(int label) {
 	writeLabelOnCode(label);
+	manipulateOutputFile(outputFileName, appendContent, "\n");
+}
+
+void writeFullLabelOnCode(int label) {
+	manipulateOutputFile(outputFileName, appendContent, "L_");
+	manipulateOutputFile(outputFileName, appendContent, intToString(label));
 	manipulateOutputFile(outputFileName, appendContent, ":\n");
 }
 
 void writeGoToOnCode(int label) {
 	manipulateOutputFile(outputFileName, appendContent, "goto ");
-	writeLabelOnCode(label);
 }
 
 void labelAndGoToOnCode(int label) {
@@ -386,10 +420,11 @@ void labelAndGoToOnCode(int label) {
 
 void writeOpOnCode(char op, char type) {
 	char* operation = malloc(sizeof(char));
+	memset(operation, '\0', strlen(operation) + 1);
 	operation[0] = type;
 	if (op == '+') {
-		operation = realloc(operation, sizeof(char) * strlen("sum\n") + 1);
-		strcat(operation, "sum\n");
+		operation = realloc(operation, sizeof(char) * strlen("add\n") + 1);
+		strcat(operation, "add\n");
 	} else if (op == '-') {
 		operation = realloc(operation, sizeof(char) * strlen("sub\n") + 1);
 		strcat(operation, "sub\n");
@@ -399,14 +434,33 @@ void writeOpOnCode(char op, char type) {
 	} else if (op == '/') {
 		operation = realloc(operation, sizeof(char) * strlen("div\n") + 1);
 		strcat(operation, "div\n");
+	} else if (op == '&') {
+		operation = realloc(operation, sizeof(char) * strlen("div\n") + 1);
+		strcat(operation, "and\n");
+	} else if (op == '|') {
+		operation = realloc(operation, sizeof(char) * strlen("div\n") + 1);
+		strcat(operation, "or\n");
 	}
 	
 	manipulateOutputFile(outputFileName, appendContent, operation);
+	free(operation);
+}
+
+int incrementLabel() {
+	return labelNum++;
 }
 
 int numOfDigits(int num) {
     if (num == 0) return 1;
     return (float) floor(log10 (abs (num))) + 1;
+}
+
+int writeIf() {
+	int label = incrementLabel();
+	manipulateOutputFile(outputFileName, appendContent, "if_icmpeq L_");
+	manipulateOutputFile(outputFileName, appendContent, intToString(label));
+
+	return label;
 }
 
 char* intToString(int num) {

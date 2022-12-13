@@ -1,6 +1,17 @@
-function oioioi():int {
-    int abluble;
-    abluble = 5 + 10 + 7;
+function iterate():int {
+    int varTeste;
 
-    return;
+    varTeste = 8;
+    
+    return varTeste;
+}
+
+function main():int {
+    int shouldBeFive;
+
+    shouldBeFive = iterate();
+
+    print();
+
+    printf(shouldBeFive);
 }

@@ -9,12 +9,6 @@
 int yylex();
 int yyparse();
 
-extern char outputFileName[];
-extern char writeContent[];
-extern char appendContent[];
-
-extern int numberOfTokensAdded;
-
 typedef struct Coord {
 	int line;
 	int col;
@@ -44,9 +38,17 @@ typedef struct SymbolType {
 	enum Type type;
 } SymbolType;
 
-#include "helpers.h"
+extern char outputFileName[];
+extern char writeContent[];
+extern char appendContent[];
 
-Table* newTable();
+extern char* opIf;
+
+extern Table* table;
+
+extern int numberOfTokensAdded;
+extern int labelNum;
+
 Table* newTable();
 
 Row* getToken(Table*, char[]);
@@ -55,6 +57,8 @@ int getTokenVarNumber(Table*, char[]);
 int getLineToken(Table*, char[]);
 int numOfDigits(int);
 int getVarType(Table*, char[]);
+int incrementLabel();
+int writeRelationalOpOnCode(char*, char*);
 
 char* intToString(int);
 
@@ -69,9 +73,8 @@ void writeFinalMainMethod();
 void finishProgram();
 void writePrintOnCode(char);
 void initializeVariableOnCode(Table*, char[], char*);
-void pushIntToVariableOnCode(Table*, char[], int);
-void pushFloatToVariableOnCode(Table*, char[], float);
-void writeRelationalOpOnCode(char*, char);
+void pushIntToVariableOnCode(Table*, char[]);
+void pushFloatToVariableOnCode(Table*, char[]);
 void writeLabelOnCode(int);
 void writeFullLabelOnCode(int);
 void writeGoToOnCode(int);
@@ -86,5 +89,7 @@ void createOutputFile(char[], char[], char[]);
 void manipulateOutputFile(char*, char*, char*);
 void generateInitialMethod();
 void changeTokenOnRow(Table*, char[], char[]);
+void loadVariable(Table*, char[]);
+void writeLabel(int);
 
 #endif
