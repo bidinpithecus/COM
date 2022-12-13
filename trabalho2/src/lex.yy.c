@@ -892,38 +892,32 @@ YY_RULE_SETUP
 	addToken(&table, yytext, "MultOP", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "*") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_MULT;
 	} else if (strcmp(yytext, "/") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_DIV;
-	} else if (strcmp(yytext, "&&")) {
-		yylval.sval = yytext;
-		return T_AND;
 	}
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 90 "tr-parte2.lex"
+#line 87 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "SumOP", &numOfTokens, &numLines, &numCol);
 	
 	if (strcmp(yytext, "+") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_SUM;
 	} else 	if (strcmp(yytext, "-") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_SUB;
-	} else if (strcmp(yytext, "||")) {
-		yylval.sval = yytext;
-		return T_OR;
 	}
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 105 "tr-parte2.lex"
+#line 99 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Bool", &numOfTokens, &numLines, &numCol);
 
@@ -936,7 +930,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 115 "tr-parte2.lex"
+#line 109 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Type", &numOfTokens, &numLines, &numCol);
 	if (strcmp(yytext, "int") == 0) {
@@ -950,11 +944,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 126 "tr-parte2.lex"
+#line 120 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "if") == 0) {
+		incrementLabel();
 		yylval.ival = labelNum;
 		return T_IF;
 	} else if (strcmp(yytext, "else") == 0) {
@@ -1008,6 +1003,7 @@ YY_RULE_SETUP
 		yylval.sval = yytext;
 		return T_PRINT;
 	} else if (strcmp(yytext, "for") == 0) { 
+		incrementLabel();
 		yylval.ival = labelNum;
 		return T_FOR;
 	}
@@ -1015,7 +1011,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 188 "tr-parte2.lex"
+#line 184 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Int", &numOfTokens, &numLines, &numCol);
 	yylval.ival = atoi(yytext);
@@ -1025,14 +1021,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 195 "tr-parte2.lex"
+#line 191 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 199 "tr-parte2.lex"
+#line 195 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "Float", &numOfTokens, &numLines, &numCol);
 	yylval.fval = atof(yytext);
@@ -1042,14 +1038,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 206 "tr-parte2.lex"
+#line 202 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 210 "tr-parte2.lex"
+#line 206 "tr-parte2.lex"
 {
 	addToken(&table, yytext, "ID", &numOfTokens, &numLines, &numCol);
 	yylval.sval = strdup(yytext);
@@ -1059,17 +1055,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 217 "tr-parte2.lex"
+#line 213 "tr-parte2.lex"
 {
 	pointError(yytext, "lexico", numLines, numCol);
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 221 "tr-parte2.lex"
+#line 217 "tr-parte2.lex"
 ECHO;
 	YY_BREAK
-#line 1073 "lex.yy.c"
+#line 1069 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2074,6 +2070,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 221 "tr-parte2.lex"
+#line 217 "tr-parte2.lex"
 
 

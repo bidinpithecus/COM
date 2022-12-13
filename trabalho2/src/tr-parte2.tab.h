@@ -73,26 +73,24 @@ extern int yydebug;
     T_SUB = 274,                   /* T_SUB  */
     T_MULT = 275,                  /* T_MULT  */
     T_DIV = 276,                   /* T_DIV  */
-    T_AND = 277,                   /* T_AND  */
-    T_OR = 278,                    /* T_OR  */
-    T_ID = 279,                    /* T_ID  */
-    T_SEMICOLON = 280,             /* T_SEMICOLON  */
-    T_OPEN_BRACKETS = 281,         /* T_OPEN_BRACKETS  */
-    T_CLOSE_BRACKETS = 282,        /* T_CLOSE_BRACKETS  */
-    T_OPEN_CURLY_BRACKETS = 283,   /* T_OPEN_CURLY_BRACKETS  */
-    T_CLOSE_CURLY_BRACKETS = 284,  /* T_CLOSE_CURLY_BRACKETS  */
-    T_OPEN_PARENTHESIS = 285,      /* T_OPEN_PARENTHESIS  */
-    T_CLOSE_PARENTHESIS = 286,     /* T_CLOSE_PARENTHESIS  */
-    T_COLON = 287,                 /* T_COLON  */
-    T_IF = 288,                    /* T_IF  */
-    T_ELSE = 289,                  /* T_ELSE  */
-    T_WHILE = 290,                 /* T_WHILE  */
-    T_FOR = 291,                   /* T_FOR  */
-    T_RETURN = 292,                /* T_RETURN  */
-    T_COMMA = 293,                 /* T_COMMA  */
-    T_ATR = 294,                   /* T_ATR  */
-    T_FUNCTION = 295,              /* T_FUNCTION  */
-    T_PROCEDURE = 296              /* T_PROCEDURE  */
+    T_ID = 277,                    /* T_ID  */
+    T_SEMICOLON = 278,             /* T_SEMICOLON  */
+    T_OPEN_BRACKETS = 279,         /* T_OPEN_BRACKETS  */
+    T_CLOSE_BRACKETS = 280,        /* T_CLOSE_BRACKETS  */
+    T_OPEN_CURLY_BRACKETS = 281,   /* T_OPEN_CURLY_BRACKETS  */
+    T_CLOSE_CURLY_BRACKETS = 282,  /* T_CLOSE_CURLY_BRACKETS  */
+    T_OPEN_PARENTHESIS = 283,      /* T_OPEN_PARENTHESIS  */
+    T_CLOSE_PARENTHESIS = 284,     /* T_CLOSE_PARENTHESIS  */
+    T_COLON = 285,                 /* T_COLON  */
+    T_IF = 286,                    /* T_IF  */
+    T_ELSE = 287,                  /* T_ELSE  */
+    T_WHILE = 288,                 /* T_WHILE  */
+    T_FOR = 289,                   /* T_FOR  */
+    T_RETURN = 290,                /* T_RETURN  */
+    T_COMMA = 291,                 /* T_COMMA  */
+    T_ATR = 292,                   /* T_ATR  */
+    T_FUNCTION = 293,              /* T_FUNCTION  */
+    T_PROCEDURE = 294              /* T_PROCEDURE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -113,7 +111,7 @@ union YYSTYPE
 	} typeAndId;
 	Type symboltypeval;
 
-#line 117 "tr-parte2.tab.h"
+#line 115 "tr-parte2.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

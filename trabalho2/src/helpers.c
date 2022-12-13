@@ -1,5 +1,7 @@
 #include "helpers.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 char outputFileName[] = "output/output.j";
 char writeContent[] = "w";
@@ -104,6 +106,16 @@ void addToken(Table **table, char *lexema, char* tokenType, int *numOfTokens, in
 void pointError(char* lexema, char* typeErr, int numLine, int numCol) {
 	printf("Erro %s em linha %d, coluna %d: %s\n", typeErr, numLine, numCol, lexema);
 }
+int isError(int num) {
+	return num == -1;
+}
+
+void printError(Table* table, char* lexema, char* errorMessage) {
+	Row* token = malloc(sizeof(Row));
+	token = getToken(table, lexema);
+
+	printf("ERROR: %s at line %d, col %d\n", errorMessage, token->coords->line, token->coords->col);
+}
 
 void printTable(Table *table, int tableSize) {
 	Row *auxRow;
@@ -189,24 +201,31 @@ void writePrintOnCode(char type) {
 	}
 }
 
-void loadVariable(Table *table, char id[]) {
+int loadVariable(Table *table, char id[]) {
 	Row* token = (Row*) malloc(sizeof(Row));
 	token = getToken(table, id);
 
-	char* fileContent = malloc(sizeof(char));
-	if (strcmp(token->token, "int") || strcmp(token->token, "bool")) {
-		fileContent[0] = 'i';
-	} else if (strcmp(token->token, "float")) {
-		fileContent[0] = 'f';
+	if (strcmp(token->token, "int") == 0 || strcmp(token->token, "bool") == 0 || strcmp(token->token, "float") == 0 || strcmp(token->token, "array") == 0) {
+		char* fileContent = malloc(sizeof(char));
+		if (strcmp(token->token, "int") == 0 || strcmp(token->token, "bool") == 0) {
+			fileContent[0] = 'i';
+		} else if (strcmp(token->token, "float") == 0) {
+			fileContent[0] = 'f';
+		} else if (strcmp(token->token, "array") == 0) {
+			fileContent[0] = 'a';
+		}
+
+		fileContent = realloc(fileContent, sizeof(char) + sizeof(char) * strlen("load ") + strlen(intToString(token->varNumber) + sizeof(char)));
+		strcat(fileContent, "load ");
+		strcat(fileContent, intToString(token->varNumber));
+		strcat(fileContent, "\n");
+
+		manipulateOutputFile(outputFileName, appendContent, fileContent);
+		free(fileContent);
+		return 1;
 	}
 
-	fileContent = realloc(fileContent, sizeof(char) + sizeof(char) * strlen("load ") + strlen(intToString(token->varNumber) + sizeof(char)));
-	strcat(fileContent, "load ");
-	strcat(fileContent, intToString(token->varNumber));
-	strcat(fileContent, "\n");
-
-	manipulateOutputFile(outputFileName, appendContent, fileContent);
-	free(fileContent);
+	return -1;
 }
 
 Row* getToken(Table* table, char id[]) {
@@ -271,7 +290,7 @@ int getLineToken(Table* table, char id[]) {
 	return 0;
 }
 
-void initializeVariableOnCode(Table* table, char id[], char* type) {
+int initializeVariableOnCode(Table* table, char id[], char type) {
 	manipulateOutputFile(outputFileName, appendContent, ".line ");
 	manipulateOutputFile(outputFileName, appendContent, intToString((getLineToken(table, id))));
 	manipulateOutputFile(outputFileName, appendContent, "\n");
@@ -284,37 +303,34 @@ void initializeVariableOnCode(Table* table, char id[], char* type) {
 		auxRow = getToken(table, id);
 
 		auxRow->varNumber = ++numberOfTokensAdded;
+
 		
-		if (strcmp(type, "i")) {
+		if (type == 'i') {
 			changeTokenOnRow(table, id, "int");
-		} else if (strcmp(type, "f")) {
+		} else if (type == 'f') {
 			changeTokenOnRow(table, id, "float");
 		}
 		char* toBeStored = malloc(sizeof(char) + strlen("const_0\n") + sizeof(char) + strlen("store") + strlen(intToString(numberOfTokensAdded)) + 2);
-		strcat(toBeStored, type);
-		strcat(toBeStored, "const_0\n");
-		strcat(toBeStored, type);
-		strcat(toBeStored, "store ");
-		strcat(toBeStored, intToString(numberOfTokensAdded));
-		strcat(toBeStored, "\n");
+		sprintf(toBeStored, "%cconst_0\n%cstore %d\n", type, type, numberOfTokensAdded);
+
 		manipulateOutputFile(outputFileName, appendContent, toBeStored);
+		free(toBeStored);
+		return 1;
 	} else {
-		printf("Variable already exists\n");
+		return -1;
 	} 
 }
 
 int getVarType(Table* table, char id[]) {
 	if (getTokenVarNumber(table, id)) {
 		Row* token = getToken(table, id);
-		if (strcmp(token->token, "int")) {
+		if (strcmp(token->token, "int") == 0) {
 			return 1;
-		} else if (strcmp(token->token, "float")) {
+		} else if (strcmp(token->token, "float") == 0) {
 			return 2;
 		}
 	}
 
-	printf("ATRIBUICAO DE VARIAVEL NAO INICIALIZADA\n");
-	
 	return 0;
 }
 
@@ -340,23 +356,31 @@ void writeFloatOnCode(float value) {
 	free(fileContent);
 }
 
-void pushIntToVariableOnCode(Table* table, char id[]) {
-	if (getTokenVarNumber(table, id)) {
+int pushIntToVariableOnCode(Table* table, char id[]) {
+	int tokenVarNumber = getTokenVarNumber(table, id);
+	if (tokenVarNumber) {
 		manipulateOutputFile(outputFileName, appendContent, "istore ");
 		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
+		return 1;
+	} else if (tokenVarNumber == -1) {
+		return -1;
 	} else {
-		printf("Variable does not exists\n");
+		return 0;
 	}
 }
 
-void pushFloatToVariableOnCode(Table* table, char id[]) {
-	if (getTokenVarNumber(table, id)) {
+int pushFloatToVariableOnCode(Table* table, char id[]) {
+	int tokenVarNumber = getTokenVarNumber(table, id);
+	if (tokenVarNumber) {
 		manipulateOutputFile(outputFileName, appendContent, "fstore ");
 		manipulateOutputFile(outputFileName, appendContent, intToString(getTokenVarNumber(table, id)));
 		manipulateOutputFile(outputFileName, appendContent, "\n");
+		return 1;
+	} else if (tokenVarNumber == -1) {
+		return -1;
 	} else {
-		printf("Variable does not exists\n");
+		return 0;
 	}
 }
 
@@ -461,6 +485,38 @@ int writeIf() {
 	manipulateOutputFile(outputFileName, appendContent, intToString(label));
 
 	return label;
+}
+
+int writeArray(int size, char* id, int type) {
+	if (! getTokenVarNumber(table, id)) {
+		// Variable does not exists yet
+		Row *auxRow;
+
+		auxRow = (Row*)malloc(sizeof(Row));
+		auxRow = getToken(table, id);
+
+		auxRow->varNumber = ++numberOfTokensAdded;
+
+		changeTokenOnRow(table, id, "array");
+		char* fileContent = malloc(100);
+		if (type == 1) {
+			sprintf(fileContent, "ldc %d\nnewarray %s\nastore %d\n", size, "int", numberOfTokensAdded);
+		} else if (type == 2) {
+			sprintf(fileContent, "ldc %d\nnewarray %s\nastore %d\n", size, "float", numberOfTokensAdded);
+		} else if (type == 3) {
+			sprintf(fileContent, "ldc %d\nnewarray %s\nastore %d\n", size, "bool", numberOfTokensAdded);
+		} else {
+			return -2;
+		}
+		
+		fileContent = realloc(fileContent, sizeof(char) * strlen(fileContent) + 2);
+		manipulateOutputFile(outputFileName, appendContent, fileContent);
+		free(fileContent);
+
+
+		return 1;
+	}
+	return -1;
 }
 
 char* intToString(int num) {

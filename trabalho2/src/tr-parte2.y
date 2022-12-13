@@ -30,7 +30,7 @@ enum types {INT_T = 1, FLOAT_T = 2, BOOL_T = 3};
 %token<sval> T_INT_TYPE T_BOOL_TYPE T_FLOAT_TYPE
 %token<fval> T_FLOAT
 %token<sval> T_SMALLER_EQUALS T_SMALLER T_GREATER T_GREATER_EQUALS T_EQUALS T_DIFFERENT T_PRINT
-%token<sval> T_SUM T_SUB T_MULT T_DIV T_AND T_OR
+%token<cval> T_SUM T_SUB T_MULT T_DIV
 %token<sval> T_ID
 %token<cval> T_SEMICOLON
 
@@ -49,8 +49,8 @@ enum types {INT_T = 1, FLOAT_T = 2, BOOL_T = 3};
 %left T_MULT T_DIV
 
 %type<sval> relacional var var_declaracao ativacao arg_lista args
-%type<sval> soma mult
-%type<ival> tipo_especificador selecao iteracao_decl
+%type<cval> soma mult
+%type<ival> tipo_especificador selecao iteracao_decl iteracao_tipo while for
 %type<typeAndId> tipo_especificador_novo
 %type<symboltypeval> expressao termo simples_expressao soma_expressao fator atribuicao retorno_decl
 
@@ -71,12 +71,27 @@ declaracao:		var_declaracao
 var_declaracao:		tipo_especificador_novo T_SEMICOLON {
 		$1.id[strlen($1.id)] = '\0';
 		if ($1.type == INT_T || $1.type == BOOL_T) {
-			initializeVariableOnCode(table, $1.id, "i");
+			if (isError(initializeVariableOnCode(table, $1.id, 'i'))) {
+				printError(table, $1.id, INT_VAR_EXISTS);
+				return 0;
+			}
 		} else if ($1.type == FLOAT_T) {
-			initializeVariableOnCode(table, $1.id, "f");
+			if (isError(initializeVariableOnCode(table, $1.id, 'f'))) {
+				printError(table, $1.id, FLOAT_VAR_EXISTS);
+				return 0;
+			}
 		}
 	}
-	|		tipo_especificador_novo T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON 
+	|		tipo_especificador_novo T_OPEN_BRACKETS T_INT T_CLOSE_BRACKETS T_SEMICOLON {
+		int wArr = writeArray($3, $1.id, $1.type);
+		if (isError(wArr)) {
+			printError(table, $1.id, ARRAY_ALREADY_EXISTS);
+			return 0;
+		} else if (wArr == -2) {
+			printError(table, $1.id, ARRAY_INVALID_TYPE);
+			return 0;
+		}
+	}
 	;
 
 tipo_especificador_novo: tipo_especificador T_ID {
@@ -177,9 +192,15 @@ for: T_FOR T_OPEN_PARENTHESIS { writeFullLabelOnCode($1); } atribuicao T_SEMICOL
 atribuicao: var T_ATR expressao {
 		int type = getVarType(table, $1);
 		if (type == INT_T) {
-			pushIntToVariableOnCode(table, $1);
+			if (isError(pushIntToVariableOnCode(table, $1))) {
+				printError(table, $1, INT_VAR_UNINITIALIZED);
+				return 0;
+			}
 		} else if (type == FLOAT_T) {
-			pushFloatToVariableOnCode(table, $1);
+			if (isError(pushFloatToVariableOnCode(table, $1))) {
+				printError(table, $1, FLOAT_VAR_UNINITIALIZED);
+				return 0;
+			}
 		}
 		$$ = $3;
 	};
@@ -189,20 +210,25 @@ retorno_decl:	T_RETURN T_SEMICOLON {}
 	;
 
 print_decl: T_PRINT T_OPEN_PARENTHESIS simples_expressao T_CLOSE_PARENTHESIS T_SEMICOLON {
-			if (ceil($3) == $3) {
-				writePrintOnCode('i');
-			} else {
-				writePrintOnCode('f');
-			}
+		writePrintOnCode('i');
 	}
 	;
 
 expressao:	var T_ATR expressao {
 		int type = getVarType(table, $1);
 		if (type == INT_T) {
-			pushIntToVariableOnCode(table, $1);
+			if (isError(pushIntToVariableOnCode(table, $1))) {
+				printError(table, $1, INT_VAR_UNINITIALIZED);
+				return 0;
+			}
 		} else if (type == FLOAT_T) {
-			pushFloatToVariableOnCode(table, $1);
+			if (isError(pushFloatToVariableOnCode(table, $1))) {
+				printError(table, $1, FLOAT_VAR_UNINITIALIZED);
+				return 0;
+			}
+		} else {
+			printError(table, $1, VAR_UNINITIALIZED);
+			return 0;
 		}
 		$$ = $3;
 	}
@@ -229,9 +255,9 @@ relacional:		T_SMALLER_EQUALS { $$ = strdup($1); }
 
 soma_expressao:		soma_expressao soma termo {
 		if (ceil($1) == $1 && ceil($3) == $3) {
-			writeOpOnCode($2[0], 'i');
+			writeOpOnCode($2, 'i');
 		} else {
-			writeOpOnCode($2[0], 'f');
+			writeOpOnCode($2, 'f');
 		}
 		$$ = $1;
 	}
@@ -240,14 +266,13 @@ soma_expressao:		soma_expressao soma termo {
 
 soma:	T_SUM { $$ = $1; }
 	|	T_SUB { $$ = $1; }
-	|	T_OR { $$ = $1; }
 	;
 
 termo:		termo mult fator {
 		if (ceil($1) == $1 && ceil($3) == $3) {
-			writeOpOnCode($2[0], 'i');
+			writeOpOnCode($2, 'i');
 		} else {
-			writeOpOnCode($2[0], 'f');
+			writeOpOnCode($2, 'f');
 		}
 		$$ = $1;
 	}
@@ -256,24 +281,29 @@ termo:		termo mult fator {
 	
 mult:		T_MULT { $$ = $1; }
 	|		T_DIV { $$ = $1; }
-	|		T_AND { $$ = $1; }
 	;
 
 fator:		T_OPEN_PARENTHESIS expressao T_CLOSE_PARENTHESIS { $$ = $2; }
 	|		var {
-		loadVariable(table, $1);
+		if (isError(loadVariable(table, $1))) {
+			printError(table, $1, LOAD_UNINITIALIZED_VAR);
+			return 0;
+		}
 	}
-	|		ativacao
+	|		ativacao 
 	|		T_INT  { writeIntOnCode($1); $$ = $1; }
 	|		T_FLOAT  { writeFloatOnCode($1); $$ = $1; }
 	;
 
 ativacao:	T_ID T_OPEN_PARENTHESIS args T_CLOSE_PARENTHESIS { 
 		Row* token = getToken(table, $1);
-		if (strcmp(token->token, "function")) {
+		if (strcmp(token->token, "function") == 0) {
 			$$ = $3;
 		} else if (strcmp(token->token, "procedure") == 0) {
-			yyerror("Trying to atribute procedure value to a variable");
+			printError(table, $1, RETURN_OF_PROC);
+			return 0;
+		} else {
+			printError(table, $1, NOT_A_FUNC);
 			return 0;
 		}
 	}
@@ -306,5 +336,5 @@ int main(int argc, char **argv) {
 }
 
 void yyerror (char const *s) {
-   fprintf (stderr, "Syntax Error: (%s)\n", s);
+   fprintf (stderr, "Syntax Error\n");
 }

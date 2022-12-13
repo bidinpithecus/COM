@@ -76,14 +76,11 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="|":"|"f
 	addToken(&table, yytext, "MultOP", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "*") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_MULT;
 	} else if (strcmp(yytext, "/") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_DIV;
-	} else if (strcmp(yytext, "&&")) {
-		yylval.sval = yytext;
-		return T_AND;
 	}
 }
 
@@ -91,14 +88,11 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="|":"|"f
 	addToken(&table, yytext, "SumOP", &numOfTokens, &numLines, &numCol);
 	
 	if (strcmp(yytext, "+") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_SUM;
 	} else 	if (strcmp(yytext, "-") == 0) {
-		yylval.sval = yytext;
+		yylval.cval = yytext[0];
 		return T_SUB;
-	} else if (strcmp(yytext, "||")) {
-		yylval.sval = yytext;
-		return T_OR;
 	}
 }
 
@@ -127,6 +121,7 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="|":"|"f
 	addToken(&table, yytext, "Keyword", &numOfTokens, &numLines, &numCol);
 
 	if (strcmp(yytext, "if") == 0) {
+		incrementLabel();
 		yylval.ival = labelNum;
 		return T_IF;
 	} else if (strcmp(yytext, "else") == 0) {
@@ -180,6 +175,7 @@ KEYWORDS "if"|"else"|"while"|"return"|";"|"["|"]"|"("|")"|"{"|"}"|","|"="|":"|"f
 		yylval.sval = yytext;
 		return T_PRINT;
 	} else if (strcmp(yytext, "for") == 0) { 
+		incrementLabel();
 		yylval.ival = labelNum;
 		return T_FOR;
 	}

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "exceptions.h"
 
 int yylex();
 int yyparse();
@@ -60,10 +61,17 @@ int getVarType(Table*, char[]);
 int incrementLabel();
 int writeRelationalOpOnCode(char*, char*);
 
+int initializeVariableOnCode(Table*, char[], char);
+int pushIntToVariableOnCode(Table*, char[]);
+int pushFloatToVariableOnCode(Table*, char[]);
+int loadVariable(Table*, char[]);
+int isError(int);
+int writeArray(int, char*, int);
+
 char* intToString(int);
 
+void printError(Table*, char*, char*);
 void addToken(Table**, char*, char*, int*, int*, int*);
-void pointError(char*, char*, int, int);
 void printTable(Table*, int);
 void manipulateOutputFile(char*, char*, char*);
 void writeInitialMethod();
@@ -72,9 +80,6 @@ void initiateProgram();
 void writeFinalMainMethod();
 void finishProgram();
 void writePrintOnCode(char);
-void initializeVariableOnCode(Table*, char[], char*);
-void pushIntToVariableOnCode(Table*, char[]);
-void pushFloatToVariableOnCode(Table*, char[]);
 void writeLabelOnCode(int);
 void writeFullLabelOnCode(int);
 void writeGoToOnCode(int);
@@ -89,7 +94,6 @@ void createOutputFile(char[], char[], char[]);
 void manipulateOutputFile(char*, char*, char*);
 void generateInitialMethod();
 void changeTokenOnRow(Table*, char[], char[]);
-void loadVariable(Table*, char[]);
 void writeLabel(int);
 
 #endif
